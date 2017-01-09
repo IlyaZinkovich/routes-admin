@@ -1,0 +1,4 @@
+rootProject.name = 'routes-admin'
+include 'routes-admin-api'
+include 'routes-admin-service'
+

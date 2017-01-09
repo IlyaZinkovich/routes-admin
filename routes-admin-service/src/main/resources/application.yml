@@ -1,0 +1,19 @@
+server:
+  port: 8881
+
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/routesdb
+    username: postgres
+    password: postgres
+
+google:
+  apiKey: AIzaSyBAHZ3gLdePXcY1GbHpQM3PEfAGwLB3lyA
+
+zeromq:
+  address: tcp://*:5563
+  ioThreads: 1
+  topic:
+    envelope:
+      findRoutes: FIND_ROUTES_TASK

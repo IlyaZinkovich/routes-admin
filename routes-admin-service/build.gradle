@@ -1,0 +1,41 @@
+group 'com.routes'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE')
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+    compile.exclude group: 'commons-logging', module: 'commons-logging'
+}
+
+dependencies {
+    compile project(':routes-admin-api')
+    compile group: 'org.zeromq', name: 'jeromq', version: '0.3.6'
+    compile group: 'com.routes', name: 'geolocation-service', version: '1.0-SNAPSHOT'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.8.8'
+    compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1211.jre7'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.6.1'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.6.1'
+    compile ('org.springframework.boot:spring-boot-starter-web')
+    compile ('org.springframework.boot:spring-boot-starter-jdbc')
+    compile ('org.springframework.boot:spring-boot-devtools')
+}
