@@ -2,50 +2,81 @@ package com.routes.admin.repository;
 
 import com.routes.admin.api.Place;
 import com.routes.admin.api.Route;
+import com.routes.admin.model.PlaceNode;
+import com.routes.admin.model.RouteRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static java.time.LocalDate.parse;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.stream.Collectors.toList;
 
 @Repository
 public class RoutesRepository {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private Neo4jOperations neo4jTemplate;
+
+    private Map<PlaceNode, PlaceNode> existingPlaces;
 
     public List<Route> findRoutes(String city, String country, LocalDate after, LocalDate before) {
-        return jdbcTemplate.query("SELECT * FROM \"ROUTES\" WHERE \"TO_PLACE_CITY\" = ? AND \"TO_PLACE_COUNTRY\" = ? " +
-                "AND \"ROUTE_DATE\" >= ? AND \"ROUTE_DATE\" <= ?",
-                new Object[]{city, country, Date.valueOf(after), Date.valueOf(before)},
-                (rs, rowNum) -> extractRoute(rs));
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("city", city);
+        parameters.put("country", country);
+        parameters.put("after", after.format(ofPattern("yyyy-MM-dd")));
+        parameters.put("before", before.format(ofPattern("yyyy-MM-dd")));
+        Iterable<RouteRelationship> routes = neo4jTemplate.queryForObjects(RouteRelationship.class,
+                "MATCH (from)-[r:ROUTE]->(to {city: {city}, country: {country}}) " +
+                        "WHERE r.date >= {after} AND r.date <= {before} RETURN r", parameters);
+        return StreamSupport.stream(routes.spliterator(), false).map(this::convert).collect(toList());
     }
 
-    private Route extractRoute(ResultSet rs) {
-        try {
-            Place from = new Place(rs.getString("FROM_PLACE_CITY"), rs.getString("FROM_PLACE_COUNTRY"),
-                    rs.getDouble("FROM_PLACE_LAT"), rs.getDouble("FROM_PLACE_LNG"));
-            Place to = new Place(rs.getString("TO_PLACE_CITY"), rs.getString("TO_PLACE_COUNTRY"),
-                    rs.getDouble("TO_PLACE_LAT"), rs.getDouble("TO_PLACE_LNG"));
-            return new Route(from, to, rs.getDate("ROUTE_DATE").toLocalDate(), rs.getString("SOURCE"));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    private Route convert(RouteRelationship route) {
+        PlaceNode from = route.getFrom();
+        PlaceNode to = route.getTo();
+        Place fromPlace = new Place(from.getCity(), from.getCountry(), from.getLatitude(), from.getLongitude());
+        Place toPlace = new Place(to.getCity(), to.getCountry(), to.getLatitude(), to.getLongitude());
+        return new Route(fromPlace, toPlace,
+                parse(route.getDate()), route.getSource());
+    }
+
+    private PlaceNode findPlaceIfExists(PlaceNode placeNode) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("city", placeNode.getCity());
+        parameters.put("country", placeNode.getCountry());
+        Iterable<PlaceNode> places = neo4jTemplate.queryForObjects(PlaceNode.class,
+                "MATCH (from {city: {city}, country:{country}}) RETURN from", parameters);
+        if (places.iterator().hasNext()) {
+            return places.iterator().next();
         }
+        return null;
     }
 
     public void save(Route route) {
+        RouteRelationship routeRelationship = convert(route);
+        PlaceNode from = findPlaceIfExists(routeRelationship.getFrom());
+        if (from != null) routeRelationship.setFrom(from);
+        PlaceNode to = findPlaceIfExists(routeRelationship.getTo());
+        if (to != null) routeRelationship.setTo(findPlaceIfExists(to));
+        neo4jTemplate.save(routeRelationship);
+        route.setId(routeRelationship.getRelationshipId());
+    }
+
+    private RouteRelationship convert(Route route) {
         Place fromPlace = route.getFromPlace();
+        PlaceNode fromPlaceNode = new PlaceNode(fromPlace.getCity(), fromPlace.getCountry(),
+                fromPlace.getLatitude(), fromPlace.getLongitude());
         Place toPlace = route.getToPlace();
-        jdbcTemplate.update("INSERT INTO \"ROUTES\"" +
-                "(\"FROM_PLACE_CITY\", \"FROM_PLACE_COUNTRY\", \"FROM_PLACE_LAT\", \"FROM_PLACE_LNG\", " +
-                "\"TO_PLACE_CITY\", \"TO_PLACE_COUNTRY\", \"TO_PLACE_LAT\", \"TO_PLACE_LNG\", " +
-                "\"ROUTE_DATE\", \"SOURCE\") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                fromPlace.getCity(), fromPlace.getCountry(), fromPlace.getLatitude(), fromPlace.getLongitude(),
-                toPlace.getCity(), toPlace.getCountry(), toPlace.getLatitude(), toPlace.getLongitude(),
-                Date.valueOf(route.getDate()), route.getSource());
+        PlaceNode toPlaceNode = new PlaceNode(toPlace.getCity(), toPlace.getCountry(),
+                toPlace.getLatitude(), toPlace.getLongitude());
+        return new RouteRelationship(fromPlaceNode, toPlaceNode,
+                        route.getDate().format(ofPattern("yyyy-MM-dd")), route.getSource());
     }
 }

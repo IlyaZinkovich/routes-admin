@@ -3,6 +3,7 @@ package com.routes.admin.service;
 import com.routes.admin.api.FindRoutesTask;
 import com.routes.admin.api.Place;
 import com.routes.admin.api.Route;
+import com.routes.admin.model.RouteRelationship;
 import com.routes.admin.publisher.TaskPublisher;
 import com.routes.admin.repository.RoutesRepository;
 import com.routes.geolocation.client.GoogleGeocodingClient;

@@ -28,6 +28,9 @@ configurations {
 
 dependencies {
     compile project(':routes-admin-api')
+    compile ('org.springframework.boot:spring-boot-starter-web')
+    compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '4.1.6.RELEASE'
+    compile ('org.springframework.boot:spring-boot-devtools')
     compile group: 'org.zeromq', name: 'jeromq', version: '0.3.6'
     compile group: 'com.routes', name: 'geolocation-service', version: '1.0-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.11'
@@ -35,7 +38,4 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1211.jre7'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.6.1'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.6.1'
-    compile ('org.springframework.boot:spring-boot-starter-web')
-    compile ('org.springframework.boot:spring-boot-starter-jdbc')
-    compile ('org.springframework.boot:spring-boot-devtools')
 }

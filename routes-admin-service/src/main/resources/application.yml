@@ -1,12 +1,11 @@
 server:
   port: 8881
 
-spring:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/routesdb
-    username: postgres
-    password: postgres
+neo4j:
+  driver: org.neo4j.ogm.drivers.http.driver.HttpDriver
+  user: neo4j
+  password: root
+  uri: http://localhost:7474
 
 google:
   apiKey: AIzaSyBAHZ3gLdePXcY1GbHpQM3PEfAGwLB3lyA
