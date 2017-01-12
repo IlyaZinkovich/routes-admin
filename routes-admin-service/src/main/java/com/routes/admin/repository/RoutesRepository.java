@@ -38,13 +38,15 @@ public class RoutesRepository {
         return StreamSupport.stream(routes.spliterator(), false).map(this::convert).collect(toList());
     }
 
-    private Route convert(RouteRelationship route) {
-        PlaceNode from = route.getFrom();
-        PlaceNode to = route.getTo();
+    private Route convert(RouteRelationship routeRelationship) {
+        PlaceNode from = routeRelationship.getFrom();
+        PlaceNode to = routeRelationship.getTo();
         Place fromPlace = new Place(from.getCity(), from.getCountry(), from.getLatitude(), from.getLongitude());
         Place toPlace = new Place(to.getCity(), to.getCountry(), to.getLatitude(), to.getLongitude());
-        return new Route(fromPlace, toPlace,
-                parse(route.getDate()), route.getSource());
+        Route route = new Route(fromPlace, toPlace,
+                parse(routeRelationship.getDate()), routeRelationship.getSource());
+        route.setId(routeRelationship.getRelationshipId());
+        return route;
     }
 
     private PlaceNode findPlaceIfExists(PlaceNode placeNode) {

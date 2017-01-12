@@ -5,16 +5,14 @@ import java.time.LocalDate;
 public class FindRoutesTask {
 
     private Place destination;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDate date;
 
     public FindRoutesTask() {
     }
 
-    public FindRoutesTask(Place destination, LocalDate startDate, LocalDate endDate) {
+    public FindRoutesTask(Place destination, LocalDate date) {
         this.destination = destination;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.date = date;
     }
 
     public Place getDestination() {
@@ -25,19 +23,11 @@ public class FindRoutesTask {
         this.destination = destination;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }
