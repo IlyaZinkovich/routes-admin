@@ -7,7 +7,7 @@ public class UnknownPlace extends Place {
     }
 
     @Override
-    public boolean isKnown() {
+    public boolean known() {
         return false;
     }
 }

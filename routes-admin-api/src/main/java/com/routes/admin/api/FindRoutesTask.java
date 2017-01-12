@@ -8,6 +8,9 @@ public class FindRoutesTask {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    public FindRoutesTask() {
+    }
+
     public FindRoutesTask(Place destination, LocalDate startDate, LocalDate endDate) {
         this.destination = destination;
         this.startDate = startDate;
@@ -18,11 +21,23 @@ public class FindRoutesTask {
         return destination;
     }
 
+    public void setDestination(Place destination) {
+        this.destination = destination;
+    }
+
     public LocalDate getStartDate() {
         return startDate;
     }
 
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
     public LocalDate getEndDate() {
         return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

@@ -1,5 +1,7 @@
 package com.routes.admin.api;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 
 public class Route {
@@ -7,6 +9,7 @@ public class Route {
     private Long id;
     private Place fromPlace;
     private Place toPlace;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;
     private String source;
 

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.zeromq.ZMQ.Socket;
 
+import java.util.stream.IntStream;
+
 @Component
 public class TaskPublisher {
 
@@ -21,8 +23,10 @@ public class TaskPublisher {
     private ObjectMapper objectMapper;
 
     public void publish(FindRoutesTask findRoutesTask) {
-        publisher.sendMore(findRoutesTaskEnvelope);
-        sendTask(findRoutesTask);
+        IntStream.range(1, 100).forEach(i -> {
+            publisher.sendMore(findRoutesTaskEnvelope);
+            sendTask(findRoutesTask);
+        });
     }
 
     private void sendTask(FindRoutesTask findRoutesTask) {

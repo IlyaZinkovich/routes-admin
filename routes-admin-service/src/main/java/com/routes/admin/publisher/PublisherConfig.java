@@ -1,6 +1,7 @@
 package com.routes.admin.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,11 +27,13 @@ public class PublisherConfig {
 
     @Bean(destroyMethod = "close")
     public Socket zmqPubSocket() {
-        return zmqContext().socket(PUB);
+        Socket socket = zmqContext().socket(PUB);
+        socket.bind(address);
+        return socket;
     }
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return new ObjectMapper().registerModule(new JavaTimeModule());
     }
 }

@@ -3,7 +3,6 @@ package com.routes.admin.service;
 import com.routes.admin.api.FindRoutesTask;
 import com.routes.admin.api.Place;
 import com.routes.admin.api.Route;
-import com.routes.admin.model.RouteRelationship;
 import com.routes.admin.publisher.TaskPublisher;
 import com.routes.admin.repository.RoutesRepository;
 import com.routes.geolocation.client.GoogleGeocodingClient;
@@ -30,7 +29,7 @@ public class RouteService {
 
     public List<Route> getRoutes(String city, String country, LocalDate startDate, LocalDate endDate) {
         Place destination = convert(geocodingClient.findGeoObject(city + ", " + country));
-        return destination.isKnown() ? getRoutesFromKnownDestination(destination, startDate, endDate)
+        return destination.known() ? getRoutesFromKnownDestination(destination, startDate, endDate)
                 : emptyList();
     }
 
